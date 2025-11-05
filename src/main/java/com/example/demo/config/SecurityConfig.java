@@ -66,35 +66,40 @@ this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 
 	    http
 	        .csrf(AbstractHttpConfigurer::disable)
+	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	        .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
 
-	        // ✅ FIXED CORS (allows localhost & railway frontend & handles OPTIONS preflight correctly)
+	        // ✅ AUTH RULES
+	        .authorizeHttpRequests(auth -> auth
+	            .requestMatchers("/api/auth/**").permitAll()
+	            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+	            .anyRequest().authenticated()
+	        )
+
+	        // ✅ CORS FIX
 	        .cors(cors -> cors.configurationSource(request -> {
-	            var config = new org.springframework.web.cors.CorsConfiguration();
-
+	            CorsConfiguration config = new CorsConfiguration();
 	            config.setAllowCredentials(true);
-
 	            config.setAllowedOriginPatterns(List.of(
 	                "http://localhost:5173",
+	                "http://127.0.0.1:5173",
 	                "https://*.up.railway.app"
 	            ));
-
-	            config.setAllowedMethods(List.of(
-	                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
-	            ));
-
-	            config.setAllowedHeaders(List.of(
-	                "Authorization", "Content-Type", "X-Requested-With"
-	            ));
-
-	            config.setExposedHeaders(List.of(
-	                "Authorization"
-	            ));
-
+	            config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
+	            config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
+	            config.setExposedHeaders(List.of("Authorization"));
 	            return config;
-	        }));
+	        }))
 
+	        // ✅ REGISTER AUTH PROVIDER
+	        .authenticationProvider(authenticationProvider)
+
+	        // ✅ ADD JWT FILTER BEFORE SPRING AUTHENTICATION FILTER
+	        .addFilterBefore(jwtAuthFilter,UsernamePasswordAuthenticationFilter.class);
 	    return http.build();
+
 	}
+
 	@Bean
 	public CorsFilter corsFilter() {
 	    CorsConfiguration config = new CorsConfiguration();
