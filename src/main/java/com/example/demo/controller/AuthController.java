@@ -17,7 +17,7 @@ import com.example.demo.entity.User;
 import com.example.demo.service.JwtService;
 import com.example.demo.service.UserDetailsServiceImpl;
 import com.example.demo.service.UserService;
-
+import java.util.Map;
 import jakarta.validation.Valid;
 
 @RestController
@@ -39,13 +39,14 @@ public class AuthController {
 	
 	
 	@PostMapping("/register")
-	public ResponseEntity<String> register(@Valid@RequestBody RegisterDTO registerDTO)
-	{
+	public ResponseEntity<Map<String, String>> register(@Valid @RequestBody RegisterDTO registerDTO)
+{
 		//accepts RegisterDTO from the user request body
-		//vali triggers validation checcks on registerDTO fields and delegates user creation to userservice .registerUser .It is responsible for hashing the password and save the new User entity
+		//valid triggers validation checks on registerDTO fields and delegates user creation to userservice .registerUser .It is responsible for hashing the password and save the new User entity
 		userService.registerUser(registerDTO);
-		return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully");
-	}
+		return ResponseEntity.status(HttpStatus.CREATED)
+		        .body(Map.of("message", "User created successfully"));
+}
 	@PostMapping("/login")
 	public ResponseEntity<AuthResponseDTO> handleLogin(@Valid@RequestBody AuthRequestDTO authRequestDTO)
 	{
