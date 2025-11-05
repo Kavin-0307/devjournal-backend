@@ -61,7 +61,15 @@ this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 
 	    http
 	        .csrf(AbstractHttpConfigurer::disable)
-	        .cors(Customizer.withDefaults())
+	        .cors(cors -> cors.configurationSource(request -> {
+	            var config = new org.springframework.web.cors.CorsConfiguration();
+	            config.setAllowCredentials(true);
+	            config.addAllowedOrigin("http://localhost:5173"); // LOCAL frontend
+	            config.addAllowedOrigin("https://devjournal-frontend-production-url-if-you-deploy"); // Future deploy
+	            config.addAllowedHeader("*");
+	            config.addAllowedMethod("*");
+	            return config;
+	        }))
 	        .authorizeHttpRequests(auth -> auth
 	                .requestMatchers("/api/auth/**").permitAll()  // login/register allowed
 	                .requestMatchers("/entries/**").authenticated() // protect journal APIs
@@ -76,5 +84,6 @@ this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 
 	    return http.build();
 	}
+
 
 }
