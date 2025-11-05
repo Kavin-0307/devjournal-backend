@@ -10,7 +10,14 @@ import com.example.demo.entity.Tag;
 
 public interface TagRepository extends JpaRepository<Tag,Long> {
 	Optional<Tag> findByName(String name);
-	@Query("SELECT t.name FROM Tag t ORDER BY LOWER(t.name) ")
+	@Query("""
+		       SELECT DISTINCT t.name
+		       FROM EntryTag et
+		       JOIN et.tag t
+		       JOIN et.journalEntry je
+		       WHERE je.user.username = :username
+		       ORDER BY LOWER(t.name)
+		       """)
+		List<String> findDistinctTagNamesByUsername(String username);
 
-	List<String> findAllTagNames();
 }

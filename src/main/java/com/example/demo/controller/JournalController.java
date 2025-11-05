@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +18,7 @@ import com.example.demo.dto.JournalRequestDTO;
 import com.example.demo.dto.JournalResponseDTO;
 import com.example.demo.dto.PaginatedJournalResponseDTO;
 import com.example.demo.entity.Tag;
+import com.example.demo.service.CurrentUserService;
 import com.example.demo.service.JournalService;
 
 import jakarta.validation.Valid;
@@ -44,7 +46,9 @@ import org.springframework.http.HttpStatus;
 //it mainly defines endpoints that clients can access process the requests delegate the bussiness logic to journal servixe and return app HTTP requests
 public class JournalController {
 	Logger logger=LoggerFactory.getLogger(JournalController.class);
-	
+	@Autowired
+	private CurrentUserService currentUserService;
+
 	@Autowired//automatic dependency injections are allowed that can be used to connect
 	public JournalController(JournalService service) {
 	    this.service = service;
@@ -110,10 +114,11 @@ public class JournalController {
 		return ResponseEntity.ok(searchResults);
 	}
 	@GetMapping("/tags")
-	public List<String> getAllTags()
-	{
-		return service.getAllTags();
+	public List<String> getUserTags() {
+	    String username = currentUserService.getCurrentUser().getUsername();
+	    return service.getTagsForUser(username);
 	}
+
 
 	@GetMapping("/{id}/export")
 	public ResponseEntity<Resource> exportEntryToMarkdown(@Valid@PathVariable("id")Long id)

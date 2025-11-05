@@ -241,10 +241,7 @@ public class JournalService {
 		return markdownBuilder.toString();
 	}
 	
-	public List<String> getAllTags()
-	{
-		return tagRepository.findAllTagNames();
-	}
+	
 	public void togglePin(Long id) {
 	    JournalEntry entry = journalRepository.findByIdAndUser_Id(id, currentUserService.getCurrentUserId())
 	            .orElseThrow(() -> new IllegalArgumentException("Entry not found"));
@@ -264,4 +261,8 @@ public class JournalService {
        
 				);
 	}
+	public List<String> getTagsForUser(String username) {
+	    return tagRepository.findDistinctTagNamesByUsername(username);
+	}
+
 }
