@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +26,12 @@ import jakarta.validation.Valid;
 
 
 public class AuthController {
-	
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<Map<String, String>> handleUserExists(IllegalArgumentException ex) {
+	    return ResponseEntity.status(HttpStatus.CONFLICT)
+	            .body(Map.of("message", ex.getMessage()));
+	}
+
 	private UserService userService;
 	private final JwtService jwtService;
 	@Autowired
