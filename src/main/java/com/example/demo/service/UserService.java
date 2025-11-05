@@ -34,26 +34,26 @@ public class UserService {
 		userRepository.save(user);
 	}
 	public AuthResponseDTO authenticateUser(AuthRequestDTO requestDTO) {
-
 	    System.out.println("Login attempt: " + requestDTO.getUsername());
-
-	    // Get user from DB
+	    
 	    User user = userRepository.findByUsername(requestDTO.getUsername())
 	            .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
 
-	    // Debug — check bcrypt comparison
-	    boolean match = passwordEncoder.matches(requestDTO.getPassword(), user.getPassword());
-	    System.out.println("Password matches? " + match);
+	    System.out.println("User found in DB: " + user.getUsername());
+	    System.out.println("Raw password entered: " + requestDTO.getPassword());
+	    System.out.println("Encoded password in DB: " + user.getPassword());
+	    System.out.println("Password match? " + passwordEncoder.matches(requestDTO.getPassword(), user.getPassword()));
 
-	    if (!match) {
+	    if (!passwordEncoder.matches(requestDTO.getPassword(), user.getPassword())) {
 	        throw new IllegalArgumentException("Invalid username or password");
 	    }
 
-	    // Create JWT
 	    String token = jwtService.generateToken(user.getUsername(), user.getRole());
+	    System.out.println("Generated token: " + token);
 
 	    return new AuthResponseDTO(token, user.getUsername(), user.getRole());
 	}
+
 
 
 }
