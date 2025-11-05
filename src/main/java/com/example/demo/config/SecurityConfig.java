@@ -67,36 +67,28 @@ this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 	        // ✅ FIXED CORS (allows localhost & railway frontend & handles OPTIONS preflight correctly)
 	        .cors(cors -> cors.configurationSource(request -> {
 	            var config = new org.springframework.web.cors.CorsConfiguration();
+
 	            config.setAllowCredentials(true);
 
 	            config.setAllowedOriginPatterns(List.of(
-	                    "http://localhost:5173",
-	                    "https://*.up.railway.app"
+	                "http://localhost:5173",
+	                "https://*.up.railway.app"
 	            ));
 
-	            config.addAllowedHeader("*");
-	            config.addAllowedMethod("*"); // includes OPTIONS automatically
+	            config.setAllowedMethods(List.of(
+	                "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+	            ));
+
+	            config.setAllowedHeaders(List.of(
+	                "Authorization", "Content-Type", "X-Requested-With"
+	            ));
+
+	            config.setExposedHeaders(List.of(
+	                "Authorization"
+	            ));
+
 	            return config;
-	        }))
-
-	        .authorizeHttpRequests(auth -> auth
-
-	                // ✅ allow OPTIONS for preflight (THIS FIXES THE 502 CORS BLOCK)
-	                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-	                // ✅ allow auth endpoints
-	                .requestMatchers("/api/auth/**").permitAll()
-
-	                // ✅ protect everything else
-	                .requestMatchers("/entries/**").authenticated()
-	                .anyRequest().authenticated()
-	        )
-
-	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-	        .authenticationProvider(authenticationProvider)
-	        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-	        .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint));
+	        }));
 
 	    return http.build();
 	}
