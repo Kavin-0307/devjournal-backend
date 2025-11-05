@@ -34,25 +34,30 @@ public class UserService {
 		userRepository.save(user);
 	}
 	public AuthResponseDTO authenticateUser(AuthRequestDTO requestDTO) {
-	    System.out.println("Login attempt: " + requestDTO.getUsername());
-	    
+	    System.out.println("---- LOGIN ATTEMPT ----");
+	    System.out.println("Username: " + requestDTO.getUsername());
+
 	    User user = userRepository.findByUsername(requestDTO.getUsername())
 	            .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
 
 	    System.out.println("User found in DB: " + user.getUsername());
 	    System.out.println("Raw password entered: " + requestDTO.getPassword());
-	    System.out.println("Encoded password in DB: " + user.getPassword());
-	    System.out.println("Password match? " + passwordEncoder.matches(requestDTO.getPassword(), user.getPassword()));
+	    System.out.println("Hashed password in DB: " + user.getPassword());
 
-	    if (!passwordEncoder.matches(requestDTO.getPassword(), user.getPassword())) {
+	    boolean passwordMatch = passwordEncoder.matches(requestDTO.getPassword(), user.getPassword());
+	    System.out.println("Password match? " + passwordMatch);
+
+	    if (!passwordMatch) {
 	        throw new IllegalArgumentException("Invalid username or password");
 	    }
 
 	    String token = jwtService.generateToken(user.getUsername(), user.getRole());
-	    System.out.println("Generated token: " + token);
+	    System.out.println("Generated JWT Token: " + token);
+	    System.out.println("---- LOGIN SUCCESS ----");
 
 	    return new AuthResponseDTO(token, user.getUsername(), user.getRole());
 	}
+
 
 
 
