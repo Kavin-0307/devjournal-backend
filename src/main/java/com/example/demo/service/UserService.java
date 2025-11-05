@@ -33,15 +33,27 @@ public class UserService {
 		user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
 		userRepository.save(user);
 	}
-	public AuthResponseDTO authenticateUser(AuthRequestDTO requestDTO)
-	{
-		User user=userRepository.findByUsername(requestDTO.getUsername()).orElseThrow(()->new IllegalArgumentException
-				("Invalid Username or Password"));
-		if(!passwordEncoder.matches(requestDTO.getPassword(),user.getPassword()))
-			throw new IllegalArgumentException("Invalid username or password");	
-		String token = jwtService.generateToken(user.getUsername(), user.getRole());
-		return new AuthResponseDTO(token, user.getUsername(), user.getRole());
+	public AuthResponseDTO authenticateUser(AuthRequestDTO requestDTO) {
 
+	    System.out.println("Login attempt: " + requestDTO.getUsername());
+
+	    // Get user from DB
+	    User user = userRepository.findByUsername(requestDTO.getUsername())
+	            .orElseThrow(() -> new IllegalArgumentException("Invalid username or password"));
+
+	    // Debug — check bcrypt comparison
+	    boolean match = passwordEncoder.matches(requestDTO.getPassword(), user.getPassword());
+	    System.out.println("Password matches? " + match);
+
+	    if (!match) {
+	        throw new IllegalArgumentException("Invalid username or password");
+	    }
+
+	    // Create JWT
+	    String token = jwtService.generateToken(user.getUsername(), user.getRole());
+
+	    return new AuthResponseDTO(token, user.getUsername(), user.getRole());
 	}
+
 
 }
