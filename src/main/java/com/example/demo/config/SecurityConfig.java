@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -56,42 +57,48 @@ this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{
 	    return config.getAuthenticationManager();
 	}
-
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http,
 	                                               DaoAuthenticationProvider authenticationProvider) throws Exception {
 
 	    http
 	        .csrf(AbstractHttpConfigurer::disable)
+
+	        // ✅ FIXED CORS (allows localhost & railway frontend & handles OPTIONS preflight correctly)
 	        .cors(cors -> cors.configurationSource(request -> {
 	            var config = new org.springframework.web.cors.CorsConfiguration();
 	            config.setAllowCredentials(true);
 
-	            // Allow localhost + ANY Railway frontend domain
 	            config.setAllowedOriginPatterns(List.of(
-	                "http://localhost:5173",
-	                "https://*.up.railway.app"   // wildcard support ✅
+	                    "http://localhost:5173",
+	                    "https://*.up.railway.app"
 	            ));
 
 	            config.addAllowedHeader("*");
-	            config.addAllowedMethod("*");
+	            config.addAllowedMethod("*"); // includes OPTIONS automatically
 	            return config;
 	        }))
 
 	        .authorizeHttpRequests(auth -> auth
-	                .requestMatchers("/api/auth/**").permitAll()  // login/register allowed
-	                .requestMatchers("/entries/**").authenticated() // protect journal APIs
+
+	                // ✅ allow OPTIONS for preflight (THIS FIXES THE 502 CORS BLOCK)
+	                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+	                // ✅ allow auth endpoints
+	                .requestMatchers("/api/auth/**").permitAll()
+
+	                // ✅ protect everything else
+	                .requestMatchers("/entries/**").authenticated()
 	                .anyRequest().authenticated()
 	        )
-	        .sessionManagement(session -> session
-	                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-	        )
+
+	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
 	        .authenticationProvider(authenticationProvider)
 	        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
 	        .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint));
 
 	    return http.build();
 	}
-
 
 }
