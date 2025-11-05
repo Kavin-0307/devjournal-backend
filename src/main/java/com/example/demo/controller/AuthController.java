@@ -38,7 +38,7 @@ public class AuthController {
 	}
 	
 	
-	@PostMapping("register")
+	@PostMapping("/register")
 	public ResponseEntity<String> register(@Valid@RequestBody RegisterDTO registerDTO)
 	{
 		//accepts RegisterDTO from the user request body
@@ -46,7 +46,7 @@ public class AuthController {
 		userService.registerUser(registerDTO);
 		return ResponseEntity.status(HttpStatus.CREATED).body("User created successfully");
 	}
-	@PostMapping("login")
+	@PostMapping("/login")
 	public ResponseEntity<AuthResponseDTO> handleLogin(@Valid@RequestBody AuthRequestDTO authRequestDTO)
 	{
 		//accepts an authrequestDTO it uses  spring security authmanager to  verify credentials
