@@ -11,6 +11,8 @@ import com.example.demo.dto.AuthResponseDTO;
 import com.example.demo.dto.RegisterDTO;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 @Service
 public class UserService {
 	private final UserRepository userRepository;
@@ -24,8 +26,8 @@ public class UserService {
 	}
 	public void registerUser(RegisterDTO registerDTO)
 	{
-		if(userRepository.findByUsername(registerDTO.getUsername()).isPresent()) {
-			throw new IllegalArgumentException("there is already such a username");
+		if (userRepository.findByUsername(registerDTO.getUsername()).isPresent()) {
+		    throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already taken");
 		}
 		User user=new User();
 		user.setUsername(registerDTO.getUsername());
