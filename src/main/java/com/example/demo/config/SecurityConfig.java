@@ -1,5 +1,7 @@
 package com.example.demo.config;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -64,12 +66,18 @@ this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 	        .cors(cors -> cors.configurationSource(request -> {
 	            var config = new org.springframework.web.cors.CorsConfiguration();
 	            config.setAllowCredentials(true);
-	            config.addAllowedOrigin("http://localhost:5173"); // LOCAL frontend
-	            config.addAllowedOrigin("https://devjournal-frontend-production-url-if-you-deploy"); // Future deploy
+
+	            // Allow localhost + ANY Railway frontend domain
+	            config.setAllowedOriginPatterns(List.of(
+	                "http://localhost:5173",
+	                "https://*.up.railway.app"   // wildcard support ✅
+	            ));
+
 	            config.addAllowedHeader("*");
 	            config.addAllowedMethod("*");
 	            return config;
 	        }))
+
 	        .authorizeHttpRequests(auth -> auth
 	                .requestMatchers("/api/auth/**").permitAll()  // login/register allowed
 	                .requestMatchers("/entries/**").authenticated() // protect journal APIs
