@@ -37,7 +37,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 
 @RestController
-@RequestMapping("/entries")
+@RequestMapping("/api/entries")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 
 
