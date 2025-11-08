@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.example.demo.entity.Tag;
+import com.example.demo.entity.User;
 
 public interface TagRepository extends JpaRepository<Tag,Long> {
 	Optional<Tag> findByName(String name);
@@ -19,5 +20,6 @@ public interface TagRepository extends JpaRepository<Tag,Long> {
 		       ORDER BY LOWER(t.name)
 		       """)
 		List<String> findDistinctTagNamesByUsername(String username);
+	Optional<Tag> findByNameAndUser(String name, User user);
 
 }
