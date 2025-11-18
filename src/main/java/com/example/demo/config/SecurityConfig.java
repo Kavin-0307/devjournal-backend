@@ -76,30 +76,38 @@ this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 	            .anyRequest().authenticated()
 	        )
 
-	        // ✅ CORS FIX
 	        .cors(cors -> cors.configurationSource(request -> {
-	            CorsConfiguration config = new CorsConfiguration();
-	            config.setAllowCredentials(true);
-	            config.setAllowedOriginPatterns(List.of(
-	                "http://localhost:5173",
-	                "http://127.0.0.1:5173",
-	                "https://*.up.railway.app",
-	                "https://devjournal-frontend.vercel.app"
-	            ));
-	            config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
-	           config.setAllowedHeaders(List.of(
-    "Authorization",
-    "Content-Type",
-    "X-Requested-With",
-    "Origin",
-    "Accept",
-    "Access-Control-Request-Method",
-    "Access-Control-Request-Headers"
-));
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowCredentials(true);
 
-				config.setExposedHeaders(List.of("Authorization"));
-	            return config;
-	        }))
+    config.setAllowedOriginPatterns(List.of(
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://*.up.railway.app",
+        "https://devjournal-frontend.vercel.app"
+    ));
+
+    // REQUIRED - FIX SUSPICIOUS ORIGIN BLOCKING
+    config.setAllowedOrigins(List.of("*"));
+
+    config.setAllowedMethods(List.of(
+        "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
+    ));
+
+    config.setAllowedHeaders(List.of(
+        "Authorization",
+        "Content-Type",
+        "X-Requested-With",
+        "Origin",
+        "Accept",
+        "Access-Control-Request-Method",
+        "Access-Control-Request-Headers"
+    ));
+
+    config.setExposedHeaders(List.of("Authorization"));
+    return config;
+}))
+
 
 	        // ✅ REGISTER AUTH PROVIDER
 	        .authenticationProvider(authenticationProvider)
