@@ -87,8 +87,17 @@ this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 	                "https://devjournal-frontend.vercel.app"
 	            ));
 	            config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
-	            config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With"));
-	            config.setExposedHeaders(List.of("Authorization"));
+	           config.setAllowedHeaders(List.of(
+    "Authorization",
+    "Content-Type",
+    "X-Requested-With",
+    "Origin",
+    "Accept",
+    "Access-Control-Request-Method",
+    "Access-Control-Request-Headers"
+));
+
+				config.setExposedHeaders(List.of("Authorization"));
 	            return config;
 	        }))
 
