@@ -88,8 +88,7 @@ this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     ));
 
     // REQUIRED - FIX SUSPICIOUS ORIGIN BLOCKING
-    config.setAllowedOrigins(List.of("*"));
-
+    
     config.setAllowedMethods(List.of(
         "GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"
     ));
