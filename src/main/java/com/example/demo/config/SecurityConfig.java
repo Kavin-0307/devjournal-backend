@@ -69,12 +69,12 @@ this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 	        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 	        .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
 
-	        // ✅ AUTH RULES
 	        .authorizeHttpRequests(auth -> auth
-	            .requestMatchers("/api/auth/**").permitAll()
-	            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-	            .anyRequest().authenticated()
-	        )
+    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // MUST BE FIRST
+    .requestMatchers("/api/auth/**").permitAll()              // allow register & login
+    .anyRequest().authenticated()
+)
+
 
 	        .cors(cors -> cors.configurationSource(request -> {
     CorsConfiguration config = new CorsConfiguration();
