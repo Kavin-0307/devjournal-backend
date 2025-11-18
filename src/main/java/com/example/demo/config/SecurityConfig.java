@@ -101,24 +101,6 @@ this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
 
 	}
 
-	@Bean
-	public CorsFilter corsFilter() {
-	    CorsConfiguration config = new CorsConfiguration();
-	    config.setAllowCredentials(true);
-	    config.setAllowedOriginPatterns(List.of(
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "https://*.up.railway.app",
-    "https://devjournal-frontend.vercel.app"
-));
-
-	    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-	    config.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-Requested-With", "Origin", "Accept"));
-	    config.setExposedHeaders(List.of("Authorization"));
-
-	    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-	    source.registerCorsConfiguration("/**", config);
-	    return new CorsFilter(source);
-	}
+	
 
 }
